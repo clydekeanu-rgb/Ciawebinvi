@@ -47,7 +47,7 @@ export const WishesWall: React.FC<WishesWallProps> = ({
   };
 
   return (
-    <section id="wishes-wall-section" className="px-4 py-6 max-w-md mx-auto">
+    <section id="wishes-wall-section" className="px-4 py-3 max-w-md lg:max-w-none mx-auto">
       <div className="bg-white rounded-3xl p-5 shadow-xl border-2 border-fuchsia-200 relative overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">

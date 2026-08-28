@@ -26,7 +26,7 @@ export const VenueMapSection: React.FC<VenueMapSectionProps> = ({ party }) => {
   };
 
   return (
-    <section id="venue-location-section" className="px-4 py-6 max-w-md mx-auto">
+    <section id="venue-location-section" className="px-4 py-3 max-w-md lg:max-w-none mx-auto">
       <div className="bg-white rounded-3xl p-5 shadow-xl border-2 border-purple-200 relative overflow-hidden">
         {/* Section Title */}
         <div className="flex items-center justify-between mb-4">
@@ -87,47 +87,23 @@ export const VenueMapSection: React.FC<VenueMapSectionProps> = ({ party }) => {
           </div>
         </div>
 
-        {/* Stylized Visual Interactive Map Preview */}
-        <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-purple-200 shadow-inner bg-slate-100 group">
-          {/* Stylized Map Grid & Roads Background */}
-          <div className="absolute inset-0 bg-[#E8ECEF] bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:14px_14px]">
-            {/* Curving pastel roads / paths */}
-            <svg className="w-full h-full opacity-60" preserveAspectRatio="none" viewBox="0 0 400 200">
-              <path d="M0,100 Q150,40 250,110 T400,80" fill="none" stroke="#FFFFFF" strokeWidth="24" strokeLinecap="round" />
-              <path d="M0,100 Q150,40 250,110 T400,80" fill="none" stroke="#F472B6" strokeWidth="3" strokeDasharray="8 6" />
-              <path d="M180,0 Q200,90 200,200" fill="none" stroke="#FFFFFF" strokeWidth="20" />
-              <path d="M180,0 Q200,90 200,200" fill="none" stroke="#93C5FD" strokeWidth="3" strokeDasharray="6 6" />
-            </svg>
-
-            {/* Landmarks / Park green areas */}
-            <div className="absolute top-2 left-3 bg-emerald-100 border border-emerald-300 rounded-xl px-2 py-1 text-[9px] font-bold text-emerald-800 flex items-center gap-1 shadow-xs">
-              🌳 Rainbow Park
-            </div>
-            <div className="absolute bottom-3 left-4 bg-amber-100 border border-amber-300 rounded-xl px-2 py-1 text-[9px] font-bold text-amber-800 flex items-center gap-1 shadow-xs">
-              🅿️ Free Parking Lot 3
-            </div>
-          </div>
-
-          {/* Center Pin Indicator */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none z-10">
-            <div className="animate-bounce">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 p-1 shadow-lg flex items-center justify-center text-white ring-4 ring-pink-300/80">
-                <span className="text-sm">🐱</span>
-              </div>
-            </div>
-            <div className="bg-slate-900/90 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow mt-1 whitespace-nowrap">
-              {party.venueName}
-            </div>
-          </div>
-
-          {/* Overlay Click to Navigate Action */}
+        {/* Real Live Google Maps Embedded Snippet */}
+        <div className="relative w-full h-52 rounded-2xl overflow-hidden border-2 border-purple-200 shadow-md bg-slate-100 group">
+          <iframe
+            title="Casa de Clara Location Map"
+            src="https://maps.google.com/maps?q=Casa+de+Clara,+Saint+Claire,+Tañong,+Marikina&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            className="w-full h-full border-0"
+            loading="lazy"
+            allowFullScreen
+          />
+          {/* Bottom Action Badge */}
           <div
             onClick={handleOpenGoogleMaps}
-            className="absolute inset-0 bg-slate-900/10 hover:bg-slate-900/20 flex items-end justify-end p-2 cursor-pointer transition-colors"
+            className="absolute bottom-2 right-2 z-10"
           >
-            <span className="bg-white/95 text-pink-600 font-bold text-[11px] px-2.5 py-1 rounded-lg shadow-sm border border-pink-200 flex items-center gap-1">
+            <span className="bg-white/95 hover:bg-white text-pink-600 font-bold text-[11px] px-3 py-1.5 rounded-xl shadow-lg border border-pink-200 flex items-center gap-1.5 cursor-pointer transition-transform active:scale-95">
               <Compass className="w-3.5 h-3.5" />
-              Tap to View Live Route
+              Open Live Route
             </span>
           </div>
         </div>

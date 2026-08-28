@@ -63,7 +63,7 @@ export const RsvpSection: React.FC<RsvpSectionProps> = ({
     .reduce((sum, r) => sum + r.kidsCount, 0);
 
   return (
-    <section id="rsvp-section" className="px-4 py-6 max-w-md mx-auto">
+    <section id="rsvp-section" className="px-4 py-3 max-w-md lg:max-w-none mx-auto">
       <div className="bg-white rounded-3xl p-5 shadow-xl border-2 border-pink-300 relative overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -173,52 +173,52 @@ export const RsvpSection: React.FC<RsvpSectionProps> = ({
               </div>
 
               {attending === 'yes' && (
-                /* Guest Counters */
+                /* Guest Counters - Perfectly Centered */
                 <div className="grid grid-cols-2 gap-3 bg-pink-50/70 p-3 rounded-2xl border border-pink-100">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-700 mb-1">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1.5 text-center">
                       Number of Kids 🧒
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2.5">
                       <button
                         type="button"
                         onClick={() => setKidsCount(Math.max(0, kidsCount - 1))}
-                        className="w-7 h-7 rounded-lg bg-white border border-pink-200 font-bold text-pink-600 flex items-center justify-center hover:bg-pink-100 cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-white border border-pink-200 font-extrabold text-pink-600 flex items-center justify-center hover:bg-pink-100 shadow-2xs active:scale-95 transition-all cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="font-bold text-sm text-slate-800 w-4 text-center">
+                      <span className="font-extrabold text-base text-slate-800 w-5 text-center">
                         {kidsCount}
                       </span>
                       <button
                         type="button"
                         onClick={() => setKidsCount(kidsCount + 1)}
-                        className="w-7 h-7 rounded-lg bg-white border border-pink-200 font-bold text-pink-600 flex items-center justify-center hover:bg-pink-100 cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-white border border-pink-200 font-extrabold text-pink-600 flex items-center justify-center hover:bg-pink-100 shadow-2xs active:scale-95 transition-all cursor-pointer"
                       >
                         +
                       </button>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-700 mb-1">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1.5 text-center">
                       Number of Adults 🧑
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2.5">
                       <button
                         type="button"
                         onClick={() => setAdultsCount(Math.max(0, adultsCount - 1))}
-                        className="w-7 h-7 rounded-lg bg-white border border-pink-200 font-bold text-pink-600 flex items-center justify-center hover:bg-pink-100 cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-white border border-pink-200 font-extrabold text-pink-600 flex items-center justify-center hover:bg-pink-100 shadow-2xs active:scale-95 transition-all cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="font-bold text-sm text-slate-800 w-4 text-center">
+                      <span className="font-extrabold text-base text-slate-800 w-5 text-center">
                         {adultsCount}
                       </span>
                       <button
                         type="button"
                         onClick={() => setAdultsCount(adultsCount + 1)}
-                        className="w-7 h-7 rounded-lg bg-white border border-pink-200 font-bold text-pink-600 flex items-center justify-center hover:bg-pink-100 cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-white border border-pink-200 font-extrabold text-pink-600 flex items-center justify-center hover:bg-pink-100 shadow-2xs active:scale-95 transition-all cursor-pointer"
                       >
                         +
                       </button>

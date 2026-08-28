@@ -124,9 +124,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     window.open(googleCalUrl, '_blank');
   };
 
-  // Compute layered parallax transforms
-  const scrollOffsetBg = Math.min(scrollY * 0.15, 30);
-  const scrollOffsetFg = Math.min(scrollY * -0.2, 40);
+  // Compute layered parallax transforms (disable scroll parallax on desktop lg screens)
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+  const scrollOffsetBg = isDesktop ? 0 : Math.min(scrollY * 0.15, 30);
+  const scrollOffsetFg = isDesktop ? 0 : Math.min(scrollY * -0.2, 40);
 
   const bgTransform = isHovered
     ? `translate3d(${tilt.y * -0.6}px, ${tilt.x * 0.6 + scrollOffsetBg}px, -20px) scale(1.12)`

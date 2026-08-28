@@ -152,7 +152,7 @@ export default function App() {
           isNavVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <div className="max-w-md mx-auto px-4 py-2.5 flex items-center justify-between">
+        <div className="max-w-md lg:max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">🐱</span>
             <div>
@@ -187,7 +187,7 @@ export default function App() {
         </div>
 
         {/* Quick Navigation Quick Bar */}
-        <div className="max-w-md mx-auto px-4 py-1.5 flex items-center justify-between gap-1 overflow-x-auto border-t border-pink-100/60 text-[11px] font-bold no-scrollbar">
+        <div className="max-w-md lg:max-w-6xl mx-auto px-4 py-1.5 flex items-center justify-between gap-1 overflow-x-auto border-t border-pink-100/60 text-[11px] font-bold no-scrollbar">
           <button
             onClick={() => scrollToSection('countdown-section')}
             className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-pink-600 hover:bg-pink-50 whitespace-nowrap transition-colors cursor-pointer"
@@ -222,61 +222,68 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-md mx-auto relative z-10 pt-24">
-        {/* 1. Celebrant Hero Image & Profile */}
-        <ScrollReveal delay={0}>
-          <HeroSection
-            party={party}
-            onRsvpClick={() => scrollToSection('rsvp-section')}
-            onDirectionsClick={() => scrollToSection('venue-location-section')}
-          />
-        </ScrollReveal>
+      <main className="max-w-md lg:max-w-6xl mx-auto relative z-10 pt-24 px-2 sm:px-4">
+        {/* Widescreen Desktop 2-Column Split Grid */}
+        <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:items-start">
+          {/* Left Column (Sticky Hero Profile on Desktop) */}
+          <div className="lg:col-span-5 space-y-2 lg:sticky lg:top-28">
+            <ScrollReveal delay={0}>
+              <HeroSection
+                party={party}
+                onRsvpClick={() => scrollToSection('rsvp-section')}
+                onDirectionsClick={() => scrollToSection('venue-location-section')}
+              />
+            </ScrollReveal>
+          </div>
 
-        {/* 2. Live Countdown Timer */}
-        <ScrollReveal delay={50}>
-          <CountdownTimer
-            targetDateIso={party.dateIso}
-            celebrantName={party.celebrantName}
-            celebrantAge={party.celebrantAge}
-          />
-        </ScrollReveal>
+          {/* Right Column (Content Feed on Desktop): Countdown, Gallery, Map, Details, RSVP & Wishes */}
+          <div className="lg:col-span-7 space-y-2 mt-4 lg:mt-0">
+            {/* Live Countdown Timer */}
+            <ScrollReveal delay={50}>
+              <CountdownTimer
+                targetDateIso={party.dateIso}
+                celebrantName={party.celebrantName}
+                celebrantAge={party.celebrantAge}
+              />
+            </ScrollReveal>
+            {/* Celestine Photo Gallery */}
+            <ScrollReveal delay={50}>
+              <PhotoGallerySection />
+            </ScrollReveal>
 
-        {/* 3. Celestine Photo Gallery */}
-        <ScrollReveal delay={50}>
-          <PhotoGallerySection />
-        </ScrollReveal>
+            {/* Venue Map Link & Directions */}
+            <ScrollReveal delay={50}>
+              <VenueMapSection party={party} />
+            </ScrollReveal>
 
-        {/* 3. Venue Map Link & Directions */}
-        <ScrollReveal delay={50}>
-          <VenueMapSection party={party} />
-        </ScrollReveal>
+            {/* Party Details (Dress Code & Anything from the Heart) */}
+            <ScrollReveal delay={50}>
+              <PartyDetailsCard party={party} />
+            </ScrollReveal>
 
-        {/* 4. Party Details (Dress Code & Food) */}
-        <ScrollReveal delay={50}>
-          <PartyDetailsCard party={party} />
-        </ScrollReveal>
+            {/* RSVP Section & Confirmed Guests */}
+            <ScrollReveal delay={50}>
+              <RsvpSection
+                party={party}
+                rsvps={rsvps}
+                onSubmitRsvp={handleAddRsvp}
+              />
+            </ScrollReveal>
 
-        {/* 5. RSVP Section & Confirmed Guests */}
-        <ScrollReveal delay={50}>
-          <RsvpSection
-            party={party}
-            rsvps={rsvps}
-            onSubmitRsvp={handleAddRsvp}
-          />
-        </ScrollReveal>
-
-        {/* 6. Wall of Wishes */}
-        <ScrollReveal delay={50}>
-          <WishesWall
-            wishes={wishes}
-            celebrantName={party.celebrantName}
-            onAddWish={handleAddWish}
-            onLikeWish={handleLikeWish}
-          />
-        </ScrollReveal>
+            {/* Wall of Wishes */}
+            <ScrollReveal delay={50}>
+              <WishesWall
+                wishes={wishes}
+                celebrantName={party.celebrantName}
+                onAddWish={handleAddWish}
+                onLikeWish={handleLikeWish}
+              />
+            </ScrollReveal>
+          </div>
+        </div>
 
         {/* Footer */}
-        <footer className="mt-8 px-4 text-center text-xs text-slate-500 space-y-2">
+        <footer className="mt-12 px-4 text-center text-xs text-slate-500 space-y-2">
           <div className="flex items-center justify-center gap-1.5 text-pink-500 font-bold">
             <span>✨</span>
             <span>A-Meow-Zing Gabby&apos;s Dollhouse Celebration</span>
@@ -285,6 +292,19 @@ export default function App() {
           <p className="text-[11px] text-slate-400">
             Featuring Zootopia 2 soundtrack vibes &amp; Dollhouse magic
           </p>
+          <div className="pt-2 border-t border-pink-100/80">
+            <p className="text-[11px] text-slate-500 font-medium">
+              Website Invitation by{' '}
+              <a
+                href="https://www.clydeabenojar.site"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-pink-600 hover:text-purple-600 underline transition-colors cursor-pointer"
+              >
+                Clyde Abenojar
+              </a>
+            </p>
+          </div>
         </footer>
       </main>
 

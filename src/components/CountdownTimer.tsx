@@ -64,7 +64,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   ];
 
   return (
-    <section id="countdown-section" className="px-4 py-6 max-w-md mx-auto">
+    <section id="countdown-section" className="px-4 py-3 max-w-md lg:max-w-none mx-auto">
       <div className="bg-white/95 rounded-3xl p-5 shadow-xl border-2 border-pink-200 dollhouse-stripes relative overflow-hidden">
         {/* 
           CELESTINE TIARA IMAGE (Background Layer z-0):
