@@ -77,13 +77,12 @@ export interface BirthdayWish {
   likes: number;
 }
 
-export type MusicTrackId = 'zootopia-try-everything' | 'gabby-sprinkle-party' | 'dollhouse-groove';
-
-export interface MusicTrack {
-  id: MusicTrackId;
-  title: string;
-  artist: string;
-  movieOrShow: string;
-  tempo: number;
-  color: string;
+export interface GuestPhoto {
+  id: string;
+  uploaderName: string;
+  caption?: string;
+  imageUrl: string;
+  createdAt: string;
+  likes: number;
 }
+

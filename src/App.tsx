@@ -15,6 +15,7 @@ import { initialPartyDetails, initialBirthdayWishes } from './data/partyData';
 import { PartyDetails, RsvpSubmission, BirthdayWish } from './types';
 import { audioEngine } from './utils/audioSynth';
 import { fetchWishesFromGoogleSheet, postWishToGoogleSheet, likeWishInGoogleSheet, fetchRsvpsFromGoogleSheet, postRsvpToGoogleSheet } from './services/googleSheets';
+import { Dock, DockIcon } from './components/magicui/dock';
 
 export default function App() {
   const [isOpened, setIsOpened] = useState(false);
@@ -146,7 +147,7 @@ export default function App() {
       {/* Background Dollhouse Sparkle Texture */}
       <div className="fixed inset-0 dollhouse-dots opacity-30 pointer-events-none" />
 
-      {/* Autohiding Mobile Navigation Header */}
+      {/* Autohiding Mobile & Desktop Header */}
       <header
         className={`fixed top-0 inset-x-0 z-40 bg-white/90 backdrop-blur-md border-b border-pink-200 shadow-xs transition-transform duration-300 ${
           isNavVisible ? 'translate-y-0' : '-translate-y-full'
@@ -184,40 +185,6 @@ export default function App() {
               {copiedLink ? <Check className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
             </button>
           </div>
-        </div>
-
-        {/* Quick Navigation Quick Bar */}
-        <div className="max-w-md lg:max-w-6xl mx-auto px-4 py-1.5 flex items-center justify-between gap-1 overflow-x-auto border-t border-pink-100/60 text-[11px] font-bold no-scrollbar">
-          <button
-            onClick={() => scrollToSection('countdown-section')}
-            className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-pink-600 hover:bg-pink-50 whitespace-nowrap transition-colors cursor-pointer"
-          >
-            ⏰ Countdown
-          </button>
-          <button
-            onClick={() => scrollToSection('photo-gallery-section')}
-            className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-pink-600 hover:bg-pink-50 whitespace-nowrap transition-colors cursor-pointer"
-          >
-            📷 Gallery
-          </button>
-          <button
-            onClick={() => scrollToSection('venue-location-section')}
-            className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-purple-600 hover:bg-purple-50 whitespace-nowrap transition-colors cursor-pointer"
-          >
-            📍 Directions
-          </button>
-          <button
-            onClick={() => scrollToSection('party-details-card')}
-            className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 whitespace-nowrap transition-colors cursor-pointer"
-          >
-            👗 Dress Code
-          </button>
-          <button
-            onClick={() => scrollToSection('rsvp-section')}
-            className="px-3 py-1 rounded-lg text-pink-600 bg-pink-50 hover:bg-pink-100 whitespace-nowrap transition-colors cursor-pointer"
-          >
-            💌 RSVP
-          </button>
         </div>
       </header>
 
@@ -307,6 +274,35 @@ export default function App() {
           </div>
         </footer>
       </main>
+
+      {/* Floating Magic UI Navigation Dock */}
+      <div className="fixed bottom-4 inset-x-0 z-50 pointer-events-none flex justify-center px-4">
+        <div className="pointer-events-auto">
+          <Dock magnification={64} distance={130}>
+            <DockIcon label="Home 🐱" onClick={() => scrollToSection('hero-celebrant-section')}>
+              <span className="text-xl">🐱</span>
+            </DockIcon>
+            <DockIcon label="Countdown ⏰" onClick={() => scrollToSection('countdown-section')}>
+              <Clock className="w-5 h-5 text-pink-500" />
+            </DockIcon>
+            <DockIcon label="Photo Gallery 📷" onClick={() => scrollToSection('photo-gallery-section')}>
+              <Sparkles className="w-5 h-5 text-purple-500" />
+            </DockIcon>
+            <DockIcon label="Map & Directions 📍" onClick={() => scrollToSection('venue-location-section')}>
+              <MapPin className="w-5 h-5 text-indigo-500" />
+            </DockIcon>
+            <DockIcon label="Dress Code & Gifts 🎁" onClick={() => scrollToSection('party-details-section')}>
+              <span className="text-lg">🎀</span>
+            </DockIcon>
+            <DockIcon label="RSVP Now 💌" onClick={() => scrollToSection('rsvp-section')}>
+              <Mail className="w-5 h-5 text-rose-500" />
+            </DockIcon>
+            <DockIcon label="Wall of Wishes 💕" onClick={() => scrollToSection('wishes-wall-section')}>
+              <Heart className="w-5 h-5 text-pink-500 fill-pink-400" />
+            </DockIcon>
+          </Dock>
+        </div>
+      </div>
 
       {/* Floating Zootopia & Gabby Music Player */}
       <MusicPlayer />

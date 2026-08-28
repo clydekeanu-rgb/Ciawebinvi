@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Play, Pause, Music, Sparkles, Disc } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Volume2, VolumeX, Play, Pause, Music, Disc, Sparkles, X } from 'lucide-react';
 import { audioEngine } from '../utils/audioSynth';
 import { availableMusicTracks } from '../data/partyData';
 import { MusicTrackId } from '../types';
@@ -9,7 +9,10 @@ export const MusicPlayer: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.65);
   const [selectedTrack, setSelectedTrack] = useState<MusicTrackId>('zootopia-try-everything');
-  const [showTrackList, setShowTrackList] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isIdle, setIsIdle] = useState(false);
+
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Sync with audio engine state
@@ -26,7 +29,26 @@ export const MusicPlayer: React.FC = () => {
     };
   }, []);
 
-  const handleTogglePlay = () => {
+  // Auto-collapse / dim to idle AssistiveTouch state when inactive
+  const resetIdleTimer = () => {
+    setIsIdle(false);
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = setTimeout(() => {
+      setIsIdle(true);
+      setIsExpanded(false);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    resetIdleTimer();
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [isExpanded, isPlaying]);
+
+  const handleTogglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    resetIdleTimer();
     if (isPlaying) {
       audioEngine.stopMusic();
     } else {
@@ -34,12 +56,15 @@ export const MusicPlayer: React.FC = () => {
     }
   };
 
-  const handleToggleMute = () => {
+  const handleToggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    resetIdleTimer();
     const muted = audioEngine.toggleMute();
     setIsMuted(muted);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetIdleTimer();
     const val = parseFloat(e.target.value);
     setVolume(val);
     audioEngine.setVolume(val);
@@ -49,8 +74,8 @@ export const MusicPlayer: React.FC = () => {
   };
 
   const handleSelectTrack = (trackId: MusicTrackId) => {
+    resetIdleTimer();
     setSelectedTrack(trackId);
-    setShowTrackList(false);
     audioEngine.stopMusic();
     audioEngine.startMusic(trackId === 'zootopia-try-everything' ? 'zootopia' : 'gabby');
   };
@@ -58,58 +83,76 @@ export const MusicPlayer: React.FC = () => {
   const currentTrackData = availableMusicTracks.find(t => t.id === selectedTrack) || availableMusicTracks[0];
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      {/* Track Selector Popup */}
-      {showTrackList && (
-        <div className="w-72 bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-2xl border-2 border-pink-200 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-pink-100">
-            <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Disc className="w-4 h-4 text-pink-500 animate-spin" />
-              Party Music Jukebox
-            </span>
+    <div
+      onMouseMove={resetIdleTimer}
+      onTouchStart={resetIdleTimer}
+      className={`fixed bottom-24 sm:bottom-28 right-4 z-40 flex flex-col items-end transition-opacity duration-300 ${
+        isIdle && !isExpanded ? 'opacity-60 hover:opacity-100' : 'opacity-100'
+      }`}
+    >
+      {/* Expanded AssistiveTouch Popup Card */}
+      {isExpanded && (
+        <div className="w-72 bg-slate-900/90 backdrop-blur-xl text-white rounded-3xl p-4 shadow-2xl border border-white/20 mb-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <Disc className={`w-4 h-4 text-pink-400 ${isPlaying ? 'animate-spin' : ''}`} />
+              <span className="text-xs font-bold font-heading">Party Jukebox</span>
+            </div>
             <button
-              onClick={() => setShowTrackList(false)}
-              className="text-xs font-bold text-slate-400 hover:text-slate-600"
+              onClick={() => setIsExpanded(false)}
+              className="p-1 text-slate-400 hover:text-white rounded-full transition-colors cursor-pointer"
             >
-              ✕
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="space-y-1.5">
+          {/* Current Track Banner */}
+          <div className="bg-white/10 rounded-2xl p-2.5 mb-3 flex items-center justify-between border border-white/10">
+            <div className="max-w-[170px]">
+              <p className="text-xs font-bold truncate text-white">{currentTrackData.title}</p>
+              <p className="text-[10px] text-pink-300 truncate">{currentTrackData.movieOrShow}</p>
+            </div>
+            <button
+              onClick={handleTogglePlay}
+              className="w-9 h-9 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all cursor-pointer"
+            >
+              {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
+            </button>
+          </div>
+
+          {/* Track Selector list */}
+          <div className="space-y-1.5 mb-3">
             {availableMusicTracks.map((track) => (
               <button
                 key={track.id}
                 onClick={() => handleSelectTrack(track.id)}
-                className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between text-xs ${
+                className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between text-xs cursor-pointer ${
                   selectedTrack === track.id
-                    ? 'bg-pink-100 text-pink-900 font-bold border border-pink-300'
-                    : 'hover:bg-pink-50 text-slate-700 font-medium'
+                    ? 'bg-pink-500/30 text-white font-bold border border-pink-400/50'
+                    : 'bg-white/5 hover:bg-white/15 text-slate-200'
                 }`}
               >
-                <div>
-                  <p className="truncate">{track.title}</p>
-                  <p className="text-[10px] text-slate-500 font-normal">{track.movieOrShow}</p>
+                <div className="truncate pr-2">
+                  <p className="truncate font-semibold">{track.title}</p>
+                  <p className="text-[10px] text-slate-400">{track.artist}</p>
                 </div>
                 {selectedTrack === track.id && (
-                  <span className="flex h-2 w-2 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
-                  </span>
+                  <Sparkles className="w-3.5 h-3.5 text-pink-400 shrink-0" />
                 )}
               </button>
             ))}
           </div>
 
-          {/* Volume slider in dropdown */}
-          <div className="mt-3 pt-2 border-t border-pink-100 flex items-center gap-2">
+          {/* Volume Slider */}
+          <div className="flex items-center gap-2.5 pt-2 border-t border-white/10">
             <button
               onClick={handleToggleMute}
-              className="text-slate-600 hover:text-pink-600 p-1"
+              className="text-slate-300 hover:text-white p-1 cursor-pointer"
             >
               {isMuted || volume === 0 ? (
                 <VolumeX className="w-4 h-4 text-slate-400" />
               ) : (
-                <Volume2 className="w-4 h-4 text-pink-500" />
+                <Volume2 className="w-4 h-4 text-pink-400" />
               )}
             </button>
             <input
@@ -119,73 +162,37 @@ export const MusicPlayer: React.FC = () => {
               step="0.05"
               value={isMuted ? 0 : volume}
               onChange={handleVolumeChange}
-              className="w-full h-1.5 bg-pink-100 rounded-lg appearance-none cursor-pointer accent-pink-500"
+              className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-pink-500"
             />
           </div>
         </div>
       )}
 
-      {/* Main Floating Floating Widget */}
-      <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-xl border-2 border-pink-200 hover:border-pink-300 transition-all">
-        {/* Play/Pause Button */}
-        <button
-          id="music-play-pause-btn"
-          onClick={handleTogglePlay}
-          className={`w-9 h-9 rounded-full flex items-center justify-center text-white transition-transform active:scale-95 shadow-md ${
-            isPlaying
-              ? 'bg-gradient-to-r from-pink-500 to-purple-600 ring-2 ring-pink-300'
-              : 'bg-gradient-to-r from-slate-400 to-slate-500'
-          }`}
-          title={isPlaying ? 'Pause Music' : 'Play Zootopia 2 Party Song'}
-        >
+      {/* Assistive Touch Circular Floating Bubble */}
+      <button
+        id="assistive-touch-music-btn"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`w-12 h-12 rounded-full bg-slate-900/85 backdrop-blur-xl shadow-2xl border-2 transition-all transform active:scale-95 cursor-pointer flex items-center justify-center relative ${
+          isPlaying
+            ? 'border-pink-400 ring-4 ring-pink-400/30 shadow-pink-500/20'
+            : 'border-white/30 hover:border-pink-300'
+        }`}
+        title={isPlaying ? 'Music Playing (Tap for controls)' : 'Tap to play party music'}
+      >
+        {/* Ring animations when playing */}
+        {isPlaying && (
+          <span className="absolute inset-0 rounded-full animate-ping bg-pink-400/30 pointer-events-none" />
+        )}
+
+        {/* Center Assistive Touch Icon */}
+        <div className="relative z-10 text-white flex items-center justify-center">
           {isPlaying ? (
-            <Pause className="w-4 h-4 fill-white" />
+            <Music className="w-5 h-5 text-pink-400 animate-bounce" />
           ) : (
-            <Play className="w-4 h-4 fill-white ml-0.5" />
+            <Play className="w-5 h-5 text-white ml-0.5" />
           )}
-        </button>
-
-        {/* Track info & Equalizer button */}
-        <button
-          onClick={() => setShowTrackList(!showTrackList)}
-          className="flex items-center gap-2 text-left cursor-pointer group"
-          title="Change Music Track"
-        >
-          <div className="max-w-[130px] sm:max-w-[160px]">
-            <div className="flex items-center gap-1">
-              <span className="text-[11px] font-bold text-slate-800 truncate group-hover:text-pink-600 transition-colors">
-                {currentTrackData.title}
-              </span>
-            </div>
-            <span className="text-[9px] text-pink-600 block truncate font-medium">
-              {isPlaying ? '🎶 Playing Party Music' : 'Tap to customize track'}
-            </span>
-          </div>
-
-          {/* Equalizer dancing bars */}
-          {isPlaying && (
-            <div className="flex items-end gap-0.5 h-4 ml-1">
-              <div className="w-1 bg-pink-500 rounded-full animate-[bounce_0.6s_infinite_ease-in-out_alternate] h-3"></div>
-              <div className="w-1 bg-purple-500 rounded-full animate-[bounce_0.8s_infinite_ease-in-out_0.2s_alternate] h-4"></div>
-              <div className="w-1 bg-cyan-400 rounded-full animate-[bounce_0.5s_infinite_ease-in-out_0.4s_alternate] h-2.5"></div>
-            </div>
-          )}
-        </button>
-
-        {/* Quick Mute Toggle */}
-        <button
-          id="music-mute-btn"
-          onClick={handleToggleMute}
-          className="p-1.5 text-slate-500 hover:text-pink-600 rounded-full hover:bg-pink-50 transition-colors ml-0.5"
-          title={isMuted ? 'Unmute' : 'Mute'}
-        >
-          {isMuted ? (
-            <VolumeX className="w-4 h-4 text-slate-400" />
-          ) : (
-            <Volume2 className="w-4 h-4 text-pink-500" />
-          )}
-        </button>
-      </div>
+        </div>
+      </button>
     </div>
   );
 };

@@ -65,14 +65,14 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
 
   return (
     <section id="countdown-section" className="px-4 py-3 max-w-md lg:max-w-none mx-auto">
-      <div className="bg-white/95 rounded-3xl p-5 shadow-xl border-2 border-pink-200 dollhouse-stripes relative overflow-hidden">
+      <div className="bg-white/95 rounded-3xl p-5 lg:p-7 lg:min-h-[240px] shadow-xl border-2 border-pink-200 dollhouse-stripes relative overflow-hidden flex flex-col justify-between">
         {/* 
           CELESTINE TIARA IMAGE (Background Layer z-0):
           - Positioned in top-right with object-contain so her head, eyes, nose, and tiara 
             sit entirely ABOVE the countdown boxes.
           - Only her shoulders & dress extend down behind the 3rd & 4th white boxes.
         */}
-        <div className="absolute right-1 top-1 h-[80%] w-1/2 sm:w-[48%] pointer-events-none z-0 flex justify-end items-start overflow-hidden">
+        <div className="absolute right-1 top-1 h-[85%] lg:h-[90%] w-1/2 sm:w-[48%] pointer-events-none z-0 flex justify-end items-start overflow-hidden">
           <img
             src="/celestine_tiara.png"
             alt={celebrantName}
@@ -81,18 +81,18 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         </div>
 
         {/* Foreground Content (z-10 relative) */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col justify-between h-full">
           {/* Header on Left side - max-w-[48%] so title NEVER covers Celestine's face */}
-          <div className="flex items-start justify-between mb-16 max-w-[48%] sm:max-w-[52%]">
+          <div className="flex items-start justify-between mb-12 lg:mb-16 max-w-[48%] sm:max-w-[52%]">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 shadow-xs shrink-0">
-                <Clock className="w-4 h-4" />
+              <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 shadow-xs shrink-0">
+                <Clock className="w-4 h-4 lg:w-5 lg:h-5" />
               </div>
               <div>
-                <h2 className="text-xs sm:text-sm font-bold font-heading text-slate-800 uppercase tracking-wider leading-tight">
+                <h2 className="text-xs sm:text-sm lg:text-base font-bold font-heading text-slate-800 uppercase tracking-wider leading-tight">
                   Party Countdown
                 </h2>
-                <p className="text-[10px] text-pink-600 font-semibold leading-tight mt-0.5">
+                <p className="text-[10px] sm:text-xs text-pink-600 font-semibold leading-tight mt-0.5">
                   Until celebration!
                 </p>
               </div>
@@ -101,18 +101,18 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
 
           {/* Live Numbers Grid - Placed below Celestine's face so her eyes/tiara are 100% visible */}
           {!timeLeft.isPartyTime ? (
-            <div className="grid grid-cols-4 gap-2 text-center my-3">
+            <div className="grid grid-cols-4 gap-2 lg:gap-3.5 text-center my-2 lg:my-0">
               {timeUnits.map((unit) => (
                 <div
                   key={unit.label}
-                  className="bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-lg border-2 border-pink-200/90 flex flex-col items-center justify-center transition-all hover:scale-105"
+                  className="bg-white/95 backdrop-blur-md rounded-2xl lg:rounded-3xl p-2.5 lg:py-4 lg:px-3 shadow-lg border-2 border-pink-200/90 flex flex-col items-center justify-center transition-all hover:scale-105"
                 >
-                  <div className={`text-2xl sm:text-3xl font-extrabold font-heading bg-gradient-to-br ${unit.color} bg-clip-text text-transparent leading-none`}>
-                    {String(unit.value).padStart(2, '0')}
+                  <div className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading bg-gradient-to-br ${unit.color} bg-clip-text text-transparent leading-none`}>
+                    {unit.value}
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">
+                  <div className="text-[9px] sm:text-[10px] lg:text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">
                     {unit.label}
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
