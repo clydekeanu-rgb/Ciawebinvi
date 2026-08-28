@@ -288,12 +288,6 @@ export default function App() {
             <DockIcon label="Home 🐱" onClick={() => scrollToSection('hero-celebrant-section')}>
               <span className="text-xl">🐱</span>
             </DockIcon>
-            <DockIcon label="Countdown ⏰" onClick={() => scrollToSection('countdown-section')}>
-              <Clock className="w-5 h-5 text-pink-500" />
-            </DockIcon>
-            <DockIcon label="Photo Gallery 📷" onClick={() => scrollToSection('photo-gallery-section')}>
-              <Sparkles className="w-5 h-5 text-purple-500" />
-            </DockIcon>
             <DockIcon label="Share Photos 📸" onClick={() => scrollToSection('guest-photos-section')}>
               <Camera className="w-5 h-5 text-teal-500" />
             </DockIcon>
@@ -305,9 +299,6 @@ export default function App() {
             </DockIcon>
             <DockIcon label="RSVP Now 💌" onClick={() => scrollToSection('rsvp-section')}>
               <Mail className="w-5 h-5 text-rose-500" />
-            </DockIcon>
-            <DockIcon label="Wall of Wishes 💕" onClick={() => scrollToSection('wishes-wall-section')}>
-              <Heart className="w-5 h-5 text-pink-500 fill-pink-400" />
             </DockIcon>
           </Dock>
         </div>
