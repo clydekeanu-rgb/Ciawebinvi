@@ -14,46 +14,14 @@ import { ScrollReveal } from './components/ScrollReveal';
 import { initialPartyDetails, initialBirthdayWishes } from './data/partyData';
 import { PartyDetails, RsvpSubmission, BirthdayWish } from './types';
 import { audioEngine } from './utils/audioSynth';
-import { fetchWishesFromGoogleSheet, postWishToGoogleSheet, likeWishInGoogleSheet } from './services/googleSheets';
+import { fetchWishesFromGoogleSheet, postWishToGoogleSheet, likeWishInGoogleSheet, fetchRsvpsFromGoogleSheet, postRsvpToGoogleSheet } from './services/googleSheets';
 
 export default function App() {
   const [isOpened, setIsOpened] = useState(false);
   const party: PartyDetails = initialPartyDetails;
 
-  const [rsvps, setRsvps] = useState<RsvpSubmission[]>(() => {
-    const saved = localStorage.getItem('gabby_party_rsvps');
-    if (saved) return JSON.parse(saved);
-    return [
-      {
-        id: 'rsvp-1',
-        guestName: 'The Miller Family',
-        emailOrPhone: 'miller@example.com',
-        attending: 'yes',
-        adultsCount: 2,
-        kidsCount: 2,
-        kidsNames: 'Lily (5) & Toby (3)',
-        dietaryRestrictions: 'None',
-        birthdayWish: 'So excited to celebrate Celestine!',
-        submittedAt: 'Yesterday'
-      },
-      {
-        id: 'rsvp-2',
-        guestName: 'Auntie Chloe & Ben',
-        emailOrPhone: '555-443-2211',
-        attending: 'yes',
-        adultsCount: 2,
-        kidsCount: 0,
-        dietaryRestrictions: 'Vegetarian',
-        birthdayWish: 'Happy birthday sweet Celestine!',
-        submittedAt: '2 days ago'
-      }
-    ];
-  });
-
-  const [wishes, setWishes] = useState<BirthdayWish[]>(() => {
-    const saved = localStorage.getItem('gabby_party_wishes');
-    return saved ? JSON.parse(saved) : initialBirthdayWishes;
-  });
+  const [rsvps, setRsvps] = useState<RsvpSubmission[]>([]);
+  const [wishes, setWishes] = useState<BirthdayWish[]>([]);
 
   const [copiedLink, setCopiedLink] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
@@ -89,9 +57,10 @@ export default function App() {
 
   const handleOpenEnvelope = () => {
     setIsOpened(true);
+    audioEngine.startMusic();
   };
 
-  const handleReplayEnvelope = () => {
+  const handleCloseEnvelope = () => {
     setIsOpened(false);
   };
 
@@ -102,10 +71,18 @@ export default function App() {
         setWishes(remoteWishes);
       }
     });
+
+    // Fetch live RSVPs from Google Sheet if Web App URL is configured
+    fetchRsvpsFromGoogleSheet().then(remoteRsvps => {
+      if (remoteRsvps && Array.isArray(remoteRsvps) && remoteRsvps.length > 0) {
+        setRsvps(remoteRsvps);
+      }
+    });
   }, []);
 
   const handleAddRsvp = (newRsvp: RsvpSubmission) => {
     setRsvps(prev => [newRsvp, ...prev]);
+    postRsvpToGoogleSheet(newRsvp);
     if (newRsvp.birthdayWish) {
       const createdWish: BirthdayWish = {
         id: `wish-${Date.now()}`,
@@ -191,7 +168,7 @@ export default function App() {
           <div className="flex items-center gap-1.5">
             {/* Replay Envelope */}
             <button
-              onClick={handleReplayEnvelope}
+              onClick={handleCloseEnvelope}
               className="p-1.5 rounded-xl text-slate-600 hover:text-pink-600 hover:bg-pink-50 transition-colors cursor-pointer"
               title="Close and Replay Interactive Envelope"
             >

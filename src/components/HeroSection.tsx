@@ -29,6 +29,51 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Mobile Gyroscope (DeviceOrientation) real-time 3D tilt
+  useEffect(() => {
+    let animId: number;
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma !== null && e.beta !== null) {
+        // Clamp gamma [-30, 30] and beta [10, 50] (standard holding angle is ~30deg)
+        const clampedGamma = Math.max(-30, Math.min(30, e.gamma));
+        const clampedBeta = Math.max(10, Math.min(50, e.beta));
+
+        const targetRotateY = (clampedGamma / 30) * 15; // tilt left/right
+        const targetRotateX = ((clampedBeta - 30) / 20) * -15; // tilt front/back
+
+        animId = requestAnimationFrame(() => {
+          setTilt({ x: targetRotateX, y: targetRotateY });
+        });
+      }
+    };
+
+    window.addEventListener('deviceorientation', handleOrientation, true);
+    window.addEventListener('deviceorientationabsolute' as any, handleOrientation, true);
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation, true);
+      window.removeEventListener('deviceorientationabsolute' as any, handleOrientation, true);
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, []);
+
+  // Touch Swipe & Drag 3D Parallax Fallback for mobile screens
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!containerRef.current || !e.touches[0]) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -15;
+    const rotateY = ((x - centerX) / centerX) * 15;
+
+    setTilt({ x: rotateX, y: rotateY });
+  };
+
   // Handle pointer / mouse movement for 3D depth
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -114,9 +159,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div
             ref={containerRef}
             onPointerMove={handlePointerMove}
+            onTouchMove={handleTouchMove}
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
-            className="relative w-full max-w-lg aspect-square sm:aspect-[4/3] my-2 rounded-3xl select-none [perspective:1000px] group cursor-default"
+            className="relative w-full max-w-lg aspect-square sm:aspect-[4/3] my-2 rounded-3xl select-none [perspective:1000px] group cursor-default touch-pan-y"
           >
             {/* Main 3D Card Base with preserve-3d */}
             <div

@@ -181,32 +181,7 @@ export const partyTimeline: TimelineEvent[] = [
   }
 ];
 
-export const initialBirthdayWishes: BirthdayWish[] = [
-  {
-    id: 'w-1',
-    sender: 'Grandma & Grandpa Rosa',
-    message: 'Happy 3rd Birthday to our sweet little sunshine princess Celestine! We can\'t wait to splash and celebrate with you!',
-    sticker: '👑',
-    timestamp: 'Yesterday',
-    likes: 4
-  },
-  {
-    id: 'w-2',
-    sender: 'Emma & Family',
-    message: 'Happy 3rd birthday Celestine! Bringing our cute swimsuits & cat ears! Can\'t wait to eat Cakey cupcakes together! 💖',
-    sticker: '🐱',
-    timestamp: 'Today at 10:15 AM',
-    likes: 6
-  },
-  {
-    id: 'w-3',
-    sender: 'Tito Dan & Tita Bea',
-    message: 'Have an A-meow-zing 3rd birthday pool party, Celestine! Keep shining bright and splashing around!',
-    sticker: '✨',
-    timestamp: '3 hours ago',
-    likes: 2
-  }
-];
+export const initialBirthdayWishes: BirthdayWish[] = [];
 
 export const availableMusicTracks: MusicTrack[] = [
   {

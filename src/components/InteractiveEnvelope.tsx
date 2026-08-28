@@ -17,6 +17,17 @@ export const InteractiveEnvelope: React.FC<InteractiveEnvelopeProps> = ({ party,
     if (isOpening || isOpen) return;
     setIsOpening(true);
 
+    // Request iOS Gyroscope permission if available (iOS 13+)
+    if (
+      typeof window !== 'undefined' &&
+      typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }).requestPermission === 'function'
+    ) {
+      (DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> })
+        .requestPermission()
+        .catch(() => {});
+    }
+
     // Play sounds & start party music (auto music play requested by user!)
     audioEngine.playEnvelopeOpenSound();
     audioEngine.startMusic('zootopia');

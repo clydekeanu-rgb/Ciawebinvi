@@ -54,11 +54,11 @@ export const RsvpSection: React.FC<RsvpSectionProps> = ({
     }
   };
 
-  const totalAttendingGuests = rsvps
+  const totalAttendingGuests = (rsvps || [])
     .filter(r => r.attending === 'yes')
     .reduce((sum, r) => sum + r.adultsCount + r.kidsCount, 0);
 
-  const totalKidsCount = rsvps
+  const totalKidsCount = (rsvps || [])
     .filter(r => r.attending === 'yes')
     .reduce((sum, r) => sum + r.kidsCount, 0);
 
