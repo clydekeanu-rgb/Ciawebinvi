@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Heart, MapPin, Clock, Calendar, Mail, Share2, Music, Check, Volume2, RefreshCw } from 'lucide-react';
+import { Camera, Sparkles, Heart, MapPin, Clock, Calendar, Mail, Share2, Music, Check, Volume2, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { InteractiveEnvelope } from './components/InteractiveEnvelope';
 import { HeroSection } from './components/HeroSection';
@@ -7,6 +7,7 @@ import { CountdownTimer } from './components/CountdownTimer';
 import { VenueMapSection } from './components/VenueMapSection';
 import { PartyDetailsCard } from './components/PartyDetailsCard';
 import { PhotoGallerySection } from './components/PhotoGallerySection';
+import { GuestPhotoSection } from './components/GuestPhotoSection';
 import { RsvpSection } from './components/RsvpSection';
 import { WishesWall } from './components/WishesWall';
 import { MusicPlayer } from './components/MusicPlayer';
@@ -237,6 +238,11 @@ export default function App() {
               />
             </ScrollReveal>
 
+            {/* Guest Photo Gallery & Memory Uploader */}
+            <ScrollReveal delay={50}>
+              <GuestPhotoSection celebrantName={party.celebrantName} />
+            </ScrollReveal>
+
             {/* Wall of Wishes */}
             <ScrollReveal delay={50}>
               <WishesWall
@@ -287,6 +293,9 @@ export default function App() {
             </DockIcon>
             <DockIcon label="Photo Gallery 📷" onClick={() => scrollToSection('photo-gallery-section')}>
               <Sparkles className="w-5 h-5 text-purple-500" />
+            </DockIcon>
+            <DockIcon label="Share Photos 📸" onClick={() => scrollToSection('guest-photos-section')}>
+              <Camera className="w-5 h-5 text-teal-500" />
             </DockIcon>
             <DockIcon label="Map & Directions 📍" onClick={() => scrollToSection('venue-location-section')}>
               <MapPin className="w-5 h-5 text-indigo-500" />
