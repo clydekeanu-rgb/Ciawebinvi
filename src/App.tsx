@@ -294,7 +294,7 @@ export default function App() {
             <DockIcon label="Map & Directions 📍" onClick={() => scrollToSection('venue-location-section')}>
               <MapPin className="w-5 h-5 text-indigo-500" />
             </DockIcon>
-            <DockIcon label="Dress Code & Gifts 🎁" onClick={() => scrollToSection('party-details-section')}>
+            <DockIcon label="Dress Code 🎀" onClick={() => scrollToSection('party-details-section')}>
               <span className="text-lg">🎀</span>
             </DockIcon>
             <DockIcon label="RSVP Now 💌" onClick={() => scrollToSection('rsvp-section')}>

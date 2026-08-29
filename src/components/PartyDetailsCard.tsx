@@ -38,45 +38,6 @@ export const PartyDetailsCard: React.FC<PartyDetailsCardProps> = ({ party }) => 
             </p>
           </div>
 
-          {/* Gift & Sizing Quick Reference */}
-          {party.childSizes && (
-            <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 rounded-2xl p-4 border-2 border-purple-200 shadow-sm relative overflow-hidden">
-              <div className="text-center mb-3">
-                <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/90 border border-pink-200 text-pink-600 font-extrabold text-xs tracking-wide shadow-2xs mb-1">
-                  <span>💖</span>
-                  <span>Anything From The Heart!</span>
-                  <span>✨</span>
-                </div>
-                <h3 className="text-lg sm:text-xl font-extrabold font-heading text-slate-800 tracking-tight leading-tight">
-                  Anything From The Heart 💕
-                </h3>
-                <p className="text-xs text-purple-700 font-bold mt-1">
-                  Your presence is the greatest gift! But if you wish...
-                </p>
-              </div>
-
-              <div className="bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-purple-100 space-y-2">
-                <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider text-center">
-                  Celestine&apos;s Sizing &amp; Favorite Hints:
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-1.5">
-                  <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200 flex items-center gap-1">
-                    <span>👕</span>
-                    <span>{party.childSizes.clothing}</span>
-                  </span>
-                  <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-200 flex items-center gap-1">
-                    <span>👟</span>
-                    <span>{party.childSizes.shoes}</span>
-                  </span>
-                  <span className="text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full border border-pink-200 flex items-center gap-1">
-                    <span>🎨</span>
-                    <span>{party.childSizes.favoriteColors.slice(0, 2).join(' & ')}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
         </div>
       </div>
     </section>
