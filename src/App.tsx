@@ -12,6 +12,7 @@ import { RsvpSection } from './components/RsvpSection';
 import { WishesWall } from './components/WishesWall';
 import { MusicPlayer } from './components/MusicPlayer';
 import { ScrollReveal } from './components/ScrollReveal';
+import { RsvpReminderModal } from './components/RsvpReminderModal';
 import { initialPartyDetails, initialBirthdayWishes } from './data/partyData';
 import { PartyDetails, RsvpSubmission, BirthdayWish } from './types';
 import { audioEngine } from './utils/audioSynth';
@@ -20,6 +21,7 @@ import { Dock, DockIcon } from './components/magicui/dock';
 
 export default function App() {
   const [isOpened, setIsOpened] = useState(false);
+  const [rsvpReminderShown, setRsvpReminderShown] = useState(false);
   const party: PartyDetails = initialPartyDetails;
 
   const [rsvps, setRsvps] = useState<RsvpSubmission[]>([]);
@@ -59,6 +61,7 @@ export default function App() {
 
   const handleOpenEnvelope = () => {
     setIsOpened(true);
+    setRsvpReminderShown(false);
     audioEngine.startMusic();
   };
 
@@ -306,6 +309,13 @@ export default function App() {
 
       {/* Floating Zootopia & Gabby Music Player */}
       <MusicPlayer />
+
+      {/* RSVP Deadline Reminder Modal */}
+      {isOpened && !rsvpReminderShown && (
+        <RsvpReminderModal
+          onAcknowledge={() => setRsvpReminderShown(true)}
+        />
+      )}
     </div>
   );
 }

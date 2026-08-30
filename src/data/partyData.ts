@@ -185,10 +185,10 @@ export const initialBirthdayWishes: BirthdayWish[] = [];
 
 export const availableMusicTracks: MusicTrack[] = [
   {
-    id: 'zootopia-try-everything',
-    title: 'Try Everything',
+    id: 'zootopia-2-zoo',
+    title: 'Zoo',
     artist: 'Shakira',
-    movieOrShow: 'Zootopia Soundtrack',
+    movieOrShow: 'Zootopia 2 Soundtrack',
     tempo: 120,
     color: 'bg-gradient-to-r from-amber-400 to-pink-500'
   },

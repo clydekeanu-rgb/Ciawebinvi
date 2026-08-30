@@ -77,7 +77,7 @@ export interface BirthdayWish {
   likes: number;
 }
 
-export type MusicTrackId = 'zootopia-try-everything' | 'gabby-sprinkle-party' | 'dollhouse-groove';
+export type MusicTrackId = 'zootopia-2-zoo' | 'gabby-sprinkle-party' | 'dollhouse-groove';
 
 export interface MusicTrack {
   id: MusicTrackId;

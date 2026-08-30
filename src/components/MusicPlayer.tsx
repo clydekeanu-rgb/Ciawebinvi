@@ -8,7 +8,7 @@ export const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.65);
-  const [selectedTrack, setSelectedTrack] = useState<MusicTrackId>('zootopia-try-everything');
+  const [selectedTrack, setSelectedTrack] = useState<MusicTrackId>('zootopia-2-zoo');
   const [isExpanded, setIsExpanded] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
 
@@ -52,7 +52,7 @@ export const MusicPlayer: React.FC = () => {
     if (isPlaying) {
       audioEngine.stopMusic();
     } else {
-      audioEngine.startMusic(selectedTrack === 'zootopia-try-everything' ? 'zootopia' : 'gabby');
+      audioEngine.startMusic(selectedTrack === 'zootopia-2-zoo' ? 'zootopia' : 'gabby');
     }
   };
 
@@ -77,7 +77,7 @@ export const MusicPlayer: React.FC = () => {
     resetIdleTimer();
     setSelectedTrack(trackId);
     audioEngine.stopMusic();
-    audioEngine.startMusic(trackId === 'zootopia-try-everything' ? 'zootopia' : 'gabby');
+    audioEngine.startMusic(trackId === 'zootopia-2-zoo' ? 'zootopia' : 'gabby');
   };
 
   const currentTrackData = availableMusicTracks.find(t => t.id === selectedTrack) || availableMusicTracks[0];

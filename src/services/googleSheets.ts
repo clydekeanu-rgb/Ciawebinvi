@@ -122,7 +122,7 @@ const GOOGLE_SHEETS_WEB_APP_URL =
  *     );
  *     var file = folder.createFile(decodedBlob);
  *     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
- *     var fileUrl = 'https://drive.google.com/uc?export=view&id=' + file.getId();
+ *     var fileUrl = 'https://lh3.googleusercontent.com/d/' + file.getId();
  * 
  *     var photoSheet = ss.getSheetByName('GuestPhotos') || ss.insertSheet('GuestPhotos');
  *     photoSheet.appendRow([

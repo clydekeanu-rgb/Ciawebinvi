@@ -1,6 +1,6 @@
 /**
  * Audio Engine
- * Plays original "Shakira - Try Everything" audio track (/try_everything.mp3)
+ * Plays original "Zootopia 2 - Zoo" audio track (/try_everything.mp3)
  * and interactive party sound effects (Envelope opening, Magic Sparkle chime, Confetti Pop).
  */
 
