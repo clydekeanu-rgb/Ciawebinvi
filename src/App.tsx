@@ -272,12 +272,12 @@ export default function App() {
             <p className="text-[11px] text-slate-500 font-medium">
               Website Invitation by{' '}
               <a
-                href="https://www.clydeabenojar.site"
+                href="https://www.curated-pages.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-bold text-pink-600 hover:text-purple-600 underline transition-colors cursor-pointer"
               >
-                Clyde Abenojar
+                Curated Pages
               </a>
             </p>
           </div>

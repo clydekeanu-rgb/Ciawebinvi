@@ -194,7 +194,7 @@ Ciawebinvi/
 
 ## 👨‍💻 Author & Credits
 
-Designed and developed with ❤️ by **[Clyde Abenojar](https://www.clydeabenojar.site)**.
+Designed and developed with ❤️ by **[Curated Pages](https://www.curated-pages.com)**.
 
 ---
 
