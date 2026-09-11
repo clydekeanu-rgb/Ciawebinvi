@@ -173,6 +173,10 @@ class AudioEngine {
     }
   }
 
+  public playPopSound() {
+    this.playConfettiPopSound();
+  }
+
   public playSparkleSound() {
     try {
       this.initContext();

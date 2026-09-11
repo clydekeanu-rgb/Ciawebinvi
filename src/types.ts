@@ -88,6 +88,13 @@ export interface MusicTrack {
   color: string;
 }
 
+export interface GuestPhotoComment {
+  id: string;
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface GuestPhoto {
   id: string;
   uploaderName: string;
@@ -95,5 +102,7 @@ export interface GuestPhoto {
   imageUrl: string;
   createdAt: string;
   likes: number;
+  reactions?: Record<string, number>;
+  comments?: GuestPhotoComment[];
 }
 

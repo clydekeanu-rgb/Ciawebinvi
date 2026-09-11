@@ -56,6 +56,26 @@ const GOOGLE_SHEETS_WEB_APP_URL =
  *       .setMimeType(ContentService.MimeType.JSON);
  *   }
  *   
+ *   if (type === 'comments') {
+ *     var commentSheet = ss.getSheetByName('PhotoComments');
+ *     if (!commentSheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+ *     var commentData = commentSheet.getDataRange().getValues();
+ *     var comments = [];
+ *     for (var c = 1; c < commentData.length; c++) {
+ *       if (commentData[c][0]) {
+ *         comments.push({
+ *           id: String(commentData[c][0]),
+ *           photoId: String(commentData[c][1]),
+ *           author: String(commentData[c][2]),
+ *           text: String(commentData[c][3]),
+ *           createdAt: String(commentData[c][4] || '')
+ *         });
+ *       }
+ *     }
+ *     return ContentService.createTextOutput(JSON.stringify(comments))
+ *       .setMimeType(ContentService.MimeType.JSON);
+ *   }
+ *   
  *   // Default: Wishes
  *   var wishSheet = ss.getSheetByName('Wishes') || ss.getSheets()[0];
  *   var wishData = wishSheet.getDataRange().getValues();
@@ -134,6 +154,19 @@ const GOOGLE_SHEETS_WEB_APP_URL =
  *       1
  *     ]);
  *     return ContentService.createTextOutput(JSON.stringify({ status: 'success', fileUrl: fileUrl }))
+ *       .setMimeType(ContentService.MimeType.JSON);
+ *   }
+ *   
+ *   if (params.action === 'addPhotoComment') {
+ *     var commentSheet = ss.getSheetByName('PhotoComments') || ss.insertSheet('PhotoComments');
+ *     commentSheet.appendRow([
+ *       params.id,
+ *       params.photoId,
+ *       params.author,
+ *       params.text,
+ *       new Date().toLocaleString()
+ *     ]);
+ *     return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
  *       .setMimeType(ContentService.MimeType.JSON);
  *   }
  *   
@@ -283,3 +316,54 @@ export const postGuestPhotoToGoogleSheet = async (photo: any): Promise<boolean> 
     return false;
   }
 };
+
+export interface RemotePhotoComment {
+  id: string;
+  photoId: string;
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
+export const fetchPhotoCommentsFromGoogleSheet = async (): Promise<RemotePhotoComment[] | null> => {
+  if (!GOOGLE_SHEETS_WEB_APP_URL) return null;
+
+  try {
+    const res = await fetch(`${GOOGLE_SHEETS_WEB_APP_URL}?type=comments`, {
+      method: 'GET'
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data) ? data : null;
+  } catch (error) {
+    console.warn('Google Sheets photo comments fetch failed:', error);
+    return null;
+  }
+};
+
+export const postPhotoCommentToGoogleSheet = async (
+  photoId: string,
+  comment: { id: string; author: string; text: string }
+): Promise<boolean> => {
+  if (!GOOGLE_SHEETS_WEB_APP_URL) return false;
+
+  try {
+    await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'addPhotoComment',
+        photoId,
+        id: comment.id,
+        author: comment.author,
+        text: comment.text
+      })
+    });
+    return true;
+  } catch (error) {
+    console.warn('Google Sheets photo comment post failed:', error);
+    return false;
+  }
+};
+

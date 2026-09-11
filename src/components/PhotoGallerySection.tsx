@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Sparkles, X, ChevronLeft, ChevronRight, Maximize2, Heart } from 'lucide-react';
+import { Camera, Sparkles, X, ChevronLeft, ChevronRight, Maximize2, Heart, LayoutGrid } from 'lucide-react';
 
 interface GalleryItem {
   id: string;
@@ -9,6 +9,7 @@ interface GalleryItem {
 
 export const PhotoGallerySection: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isGridModalOpen, setIsGridModalOpen] = useState(false);
 
   // All 20 photos (5 uploaded + 15 from downloads/cia)
   const photos: GalleryItem[] = [
@@ -82,10 +83,16 @@ export const PhotoGallerySection: React.FC = () => {
             </div>
           </div>
 
-          <span className="text-xs font-bold text-pink-600 bg-pink-50 border border-pink-200 px-2.5 py-1 rounded-full flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-pink-500" />
-            {photos.length} Photos
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setIsGridModalOpen(true)}
+              className="text-xs font-bold text-pink-700 bg-pink-50 hover:bg-pink-100 border border-pink-200 hover:border-pink-300 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+              title="View all 20 photos in grid"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-pink-500" />
+              <span>View All ({photos.length})</span>
+            </button>
+          </div>
         </div>
 
         {/* Marquee Carousel Tracks Wrapper with Soft Edge Fade */}
@@ -155,17 +162,98 @@ export const PhotoGallerySection: React.FC = () => {
             <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-400" />
             Continuous live marquee reel!
           </span>
-          <span className="text-[11px] font-bold text-pink-600">
-            #CelestineGallery
-          </span>
+          <button
+            onClick={() => setIsGridModalOpen(true)}
+            className="text-[11px] font-bold text-pink-600 hover:text-pink-700 underline cursor-pointer flex items-center gap-1"
+          >
+            <span>Browse all photos</span>
+            <span>&rarr;</span>
+          </button>
         </div>
       </div>
+
+      {/* Full-Screen All Photos Grid Modal */}
+      {isGridModalOpen && (
+        <div
+          onClick={() => setIsGridModalOpen(false)}
+          className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col animate-in fade-in duration-200"
+        >
+          {/* Grid Modal Header */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-pink-200 px-4 py-3 flex items-center justify-between shadow-xs"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 shadow-xs">
+                <Camera className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold font-heading text-slate-800 flex items-center gap-1.5">
+                  <span>Celestine&apos;s Photo Gallery</span>
+                  <span className="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-sans font-semibold">
+                    {photos.length}
+                  </span>
+                </h3>
+                <p className="text-[11px] text-pink-600 font-medium">
+                  Tap any photo to view in full resolution
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsGridModalOpen(false)}
+              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+              title="Close Gallery Grid"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Grid Modal Scrollable Body */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 overflow-y-auto p-4 sm:p-6"
+          >
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                {photos.map((item, idx) => (
+                  <div
+                    key={`all-${item.id}-${idx}`}
+                    onClick={() => setSelectedIndex(idx)}
+                    className="group relative aspect-3/4 rounded-2xl overflow-hidden border-2 border-white/20 bg-slate-800 shadow-md hover:shadow-xl hover:border-pink-400 hover:scale-[1.02] transition-all cursor-pointer"
+                  >
+                    <img
+                      src={item.url}
+                      alt={item.caption}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-75 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2.5">
+                      <span className="self-end bg-black/60 backdrop-blur-xs text-[10px] text-pink-200 font-mono px-2 py-0.5 rounded-full">
+                        #{idx + 1}
+                      </span>
+                      <div>
+                        <p className="text-[11px] font-semibold text-white line-clamp-2 leading-snug drop-shadow-xs">
+                          {item.caption}
+                        </p>
+                        <span className="text-[9px] text-pink-300 font-medium flex items-center gap-1 mt-0.5">
+                          <Maximize2 className="w-2.5 h-2.5" /> Tap to view
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Full-Screen Lightbox Modal */}
       {selectedIndex !== null && (
         <div
           onClick={closeLightbox}
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
         >
           {/* Close button */}
           <button
