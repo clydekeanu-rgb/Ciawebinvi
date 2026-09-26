@@ -201,3 +201,22 @@ export const availableMusicTracks: MusicTrack[] = [
     color: 'bg-gradient-to-r from-pink-400 to-purple-500'
   }
 ];
+
+/**
+ * Party Configuration & Homepage Switcher:
+ *
+ * Change `homepageMode` to switch what visitors see at the root URL ("/"):
+ * - 'pre': Pre-event invitation (Interactive envelope, countdown, RSVP)
+ * - 'during': Live event day page (Happening today, live photos, schedule, directions)
+ * - 'after': Post-event thank you page (Thank you note, memory photo album, wishes wall)
+ * - 'auto': Automatically switches based on current date/time!
+ *           (Pre-event before Oct 3, During-event on Oct 3, After-event after Oct 3)
+ *
+ * Visitors can also access any page directly via:
+ * - / (Active homepage)
+ * - /during (Live event day stub page)
+ * - /after (Post-event memories stub page)
+ */
+export const partyConfig = {
+  homepageMode: 'pre' as import('../types').HomepageMode,
+};

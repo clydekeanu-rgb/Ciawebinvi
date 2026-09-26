@@ -6,14 +6,16 @@ import { audioEngine } from '../utils/audioSynth';
 
 interface HeroSectionProps {
   party: PartyDetails;
-  onRsvpClick: () => void;
+  onRsvpClick?: () => void;
   onDirectionsClick: () => void;
+  showRsvpButton?: boolean;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   party,
   onRsvpClick,
   onDirectionsClick,
+  showRsvpButton = true,
 }) => {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -296,20 +298,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {/* Quick CTA Action Row */}
-        <div className="mt-5 grid grid-cols-2 gap-2.5 w-full max-w-sm">
-          <button
-            id="hero-rsvp-btn"
-            onClick={onRsvpClick}
-            className="py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-pink-300/40 flex items-center justify-center gap-1.5 transition-all duration-150 transform active:scale-97 hover:-translate-y-0.5 cursor-pointer"
-          >
-            <PartyPopper className="w-4 h-4" />
-            RSVP Attending
-          </button>
+        <div className={`mt-5 w-full max-w-sm ${showRsvpButton ? 'grid grid-cols-2 gap-2.5' : 'flex justify-center'}`}>
+          {showRsvpButton && (
+            <button
+              id="hero-rsvp-btn"
+              onClick={onRsvpClick}
+              className="py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-pink-300/40 flex items-center justify-center gap-1.5 transition-all duration-150 transform active:scale-97 hover:-translate-y-0.5 cursor-pointer"
+            >
+              <PartyPopper className="w-4 h-4" />
+              RSVP Attending
+            </button>
+          )}
 
           <button
             id="hero-directions-btn"
             onClick={onDirectionsClick}
-            className="py-3 px-4 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold text-sm shadow-lg shadow-purple-300/40 flex items-center justify-center gap-1.5 transition-all duration-150 transform active:scale-97 hover:-translate-y-0.5 cursor-pointer"
+            className={`py-3 px-4 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold text-sm shadow-lg shadow-purple-300/40 flex items-center justify-center gap-1.5 transition-all duration-150 transform active:scale-97 hover:-translate-y-0.5 cursor-pointer ${
+              showRsvpButton ? '' : 'w-full'
+            }`}
           >
             <MapPin className="w-4 h-4" />
             Location &amp; Map
