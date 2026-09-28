@@ -188,9 +188,9 @@ export const DuringEventPage: React.FC<DuringEventPageProps> = ({
               />
             </ScrollReveal>
 
-            {/* 5. Guest Photo Gallery - FACEBOOK FEED STYLE ON DEFAULT (LAST SECTION) */}
+            {/* 5. Guest Photo Gallery - Marquee carousel on default (LAST SECTION) */}
             <ScrollReveal delay={50}>
-              <GuestPhotoSection celebrantName={party.celebrantName} defaultView="feed" />
+              <GuestPhotoSection celebrantName={party.celebrantName} defaultView="marquee" />
             </ScrollReveal>
           </div>
         </div>

@@ -44,7 +44,7 @@ interface PhotoMetaItem {
 export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
   celebrantName,
   onUploadPhoto,
-  defaultView = 'feed',
+  defaultView = 'marquee',
   wishes,
   onAddWish,
   onLikeWish
@@ -59,9 +59,13 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
   const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  // Facebook Feed View State - DEFAULT TO 'feed'
+  // View Mode: 'marquee' (default on homepage and /during) vs 'feed' (default on /after)
   const [viewMode, setViewMode] = useState<'feed' | 'marquee'>(defaultView);
   const [feedSortBy, setFeedSortBy] = useState<'latest' | 'popular'>('latest');
+
+  useEffect(() => {
+    setViewMode(defaultView);
+  }, [defaultView]);
 
   // Photo Reactions & Comments Metadata (LocalStorage synced)
   const [photoMeta, setPhotoMeta] = useState<Record<string, PhotoMetaItem>>(() => {

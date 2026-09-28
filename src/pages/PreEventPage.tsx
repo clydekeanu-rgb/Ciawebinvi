@@ -199,7 +199,7 @@ export const PreEventPage: React.FC<PreEventPageProps> = ({
 
             {/* Guest Photo Gallery & Memory Uploader */}
             <ScrollReveal delay={50}>
-              <GuestPhotoSection celebrantName={party.celebrantName} />
+              <GuestPhotoSection celebrantName={party.celebrantName} defaultView="marquee" />
             </ScrollReveal>
 
             {/* Wall of Wishes */}
