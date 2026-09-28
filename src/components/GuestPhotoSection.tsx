@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   CheckCircle,
   MessageSquare,
+  MessageCircleHeart,
   Send,
   Share2,
   Filter,
@@ -15,7 +16,7 @@ import {
   LayoutGrid,
   List
 } from 'lucide-react';
-import { GuestPhoto, GuestPhotoComment } from '../types';
+import { GuestPhoto, GuestPhotoComment, BirthdayWish } from '../types';
 import confetti from 'canvas-confetti';
 import { audioEngine } from '../utils/audioSynth';
 import {
@@ -29,6 +30,10 @@ interface GuestPhotoSectionProps {
   celebrantName: string;
   onUploadPhoto?: (photo: GuestPhoto) => void;
   defaultView?: 'feed' | 'marquee';
+  /** When provided, wishes are interleaved in the feed as Facebook-wall-style posts */
+  wishes?: BirthdayWish[];
+  onAddWish?: (wish: BirthdayWish) => void;
+  onLikeWish?: (wishId: string) => void;
 }
 
 interface PhotoMetaItem {
@@ -39,7 +44,10 @@ interface PhotoMetaItem {
 export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
   celebrantName,
   onUploadPhoto,
-  defaultView = 'feed'
+  defaultView = 'feed',
+  wishes,
+  onAddWish,
+  onLikeWish
 }) => {
   const [photos, setPhotos] = useState<GuestPhoto[]>([]);
 
@@ -688,6 +696,127 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
     );
   };
 
+  // Render a Birthday Wish as a Facebook-Wall-Style Post
+  const renderWishPost = (wish: BirthdayWish) => {
+    return (
+      <article
+        key={`wish-post-${wish.id}`}
+        className="bg-white rounded-3xl border border-fuchsia-200/80 shadow-md overflow-hidden transition-all hover:shadow-lg mb-4"
+      >
+        {/* Wish Post Header */}
+        <div className="p-3.5 pb-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className={`w-10 h-10 rounded-full bg-gradient-to-tr ${getAvatarColor(
+                wish.sender
+              )} flex items-center justify-center text-white font-bold text-sm shadow-xs shrink-0`}
+            >
+              {getAvatarInitials(wish.sender)}
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+                {wish.sender}
+              </h4>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
+                <span>{wish.timestamp || 'Birthday Note'}</span>
+                <span>•</span>
+                <span className="text-fuchsia-600 font-semibold flex items-center gap-0.5">
+                  <MessageCircleHeart className="w-2.5 h-2.5" /> Birthday Wish
+                </span>
+              </div>
+            </div>
+          </div>
+          <span className="text-2xl">{wish.sticker}</span>
+        </div>
+
+        {/* Wish Message Body */}
+        <div className="px-4 pb-3 text-sm sm:text-base text-slate-800 leading-relaxed font-normal whitespace-pre-wrap">
+          {wish.message}
+        </div>
+
+        {/* Wish Gradient Accent Bar */}
+        <div className="mx-4 mb-3 h-1 rounded-full bg-gradient-to-r from-pink-300 via-fuchsia-300 to-purple-300 opacity-60" />
+
+        {/* Like Action */}
+        <div className="px-4 py-2.5 flex items-center justify-between border-t border-fuchsia-50 bg-fuchsia-50/30">
+          <div className="flex items-center gap-1 text-[11px] text-slate-500">
+            <span className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-xs">❤️</span>
+            <span className="font-semibold text-slate-700 ml-0.5">{wish.likes}</span>
+          </div>
+          {onLikeWish && (
+            <button
+              onClick={() => onLikeWish(wish.id)}
+              className="flex items-center gap-1.5 text-xs font-bold text-pink-600 bg-white hover:bg-pink-50 px-3 py-1.5 rounded-xl border border-pink-200 shadow-2xs transition-all cursor-pointer active:scale-95"
+            >
+              <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
+              <span>Love</span>
+            </button>
+          )}
+        </div>
+      </article>
+    );
+  };
+
+  // Wish form state (only used when wishes are integrated)
+  const [wishSenderName, setWishSenderName] = useState('');
+  const [wishMessage, setWishMessage] = useState('');
+  const [wishSticker, setWishSticker] = useState('💖');
+  const wishStickers = ['💖', '🐱', '✨', '🧁', '👑', '🎉', '🦄', '🎈'];
+
+  const handleSubmitWish = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wishSenderName.trim() || !wishMessage.trim() || !onAddWish) return;
+
+    const newWish: BirthdayWish = {
+      id: `wish-${Date.now()}`,
+      sender: wishSenderName.trim(),
+      message: wishMessage.trim(),
+      sticker: wishSticker,
+      timestamp: 'Just now',
+      likes: 1
+    };
+
+    onAddWish(newWish);
+    setWishSenderName('');
+    setWishMessage('');
+
+    confetti({
+      particleCount: 40,
+      spread: 50,
+      origin: { y: 0.85 }
+    });
+  };
+
+  // Build interleaved feed: photos + wishes merged chronologically
+  type FeedItem = { type: 'photo'; data: GuestPhoto } | { type: 'wish'; data: BirthdayWish };
+
+  const interleavedFeed: FeedItem[] = (() => {
+    const photoItems: FeedItem[] = sortedPhotosForFeed.map(p => ({ type: 'photo' as const, data: p }));
+
+    if (!wishes || wishes.length === 0) return photoItems;
+
+    const wishItems: FeedItem[] = wishes.map(w => ({ type: 'wish' as const, data: w }));
+
+    // Interleave: show a wish after every 2 photos, then remaining wishes at the end
+    const merged: FeedItem[] = [];
+    let wishIdx = 0;
+    for (let i = 0; i < photoItems.length; i++) {
+      merged.push(photoItems[i]);
+      // After every 2nd photo, insert a wish
+      if ((i + 1) % 2 === 0 && wishIdx < wishItems.length) {
+        merged.push(wishItems[wishIdx]);
+        wishIdx++;
+      }
+    }
+    // Append remaining wishes
+    while (wishIdx < wishItems.length) {
+      merged.push(wishItems[wishIdx]);
+      wishIdx++;
+    }
+
+    return merged;
+  })();
+
   return (
     <section id="guest-photos-section" className="px-4 py-3 max-w-md lg:max-w-none mx-auto">
       <div className="bg-white rounded-3xl p-5 shadow-xl border-2 border-pink-200 relative overflow-hidden">
@@ -864,20 +993,74 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
           )}
         </form>
 
-        {/* DEFAULT VIEW: Facebook-Style Feed */}
+        {/* Inline Wish Composer (when wishes are integrated into the feed) */}
+        {wishes && onAddWish && (
+          <form onSubmit={handleSubmitWish} className="bg-gradient-to-br from-fuchsia-50/80 via-purple-50/50 to-pink-50/80 p-4 rounded-2xl border border-fuchsia-100 mb-5 space-y-3">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-1">
+              <MessageCircleHeart className="w-3.5 h-3.5 text-fuchsia-500" />
+              <span>Leave a Birthday Note for {celebrantName}:</span>
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Your Name"
+                value={wishSenderName}
+                onChange={(e) => setWishSenderName(e.target.value)}
+                className="w-1/2 p-2 rounded-xl border border-fuchsia-200 focus:ring-2 focus:ring-pink-400 bg-white text-xs"
+                required
+              />
+              <div className="w-1/2 flex items-center justify-around bg-white p-1 rounded-xl border border-fuchsia-200">
+                {wishStickers.slice(0, 5).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setWishSticker(s)}
+                    className={`text-base p-0.5 rounded-md cursor-pointer ${wishSticker === s ? 'bg-fuchsia-100 scale-125' : 'opacity-70'}`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder={`Write your wish for ${celebrantName}...`}
+                value={wishMessage}
+                onChange={(e) => setWishMessage(e.target.value)}
+                className="flex-1 p-2 rounded-xl border border-fuchsia-200 focus:ring-2 focus:ring-pink-400 bg-white text-xs"
+                required
+              />
+              <button
+                type="submit"
+                className="px-3.5 py-2 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white rounded-xl font-bold shadow-xs hover:from-fuchsia-600 hover:to-purple-700 flex items-center justify-center shrink-0 cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* DEFAULT VIEW: Facebook-Style Feed (with interleaved wishes when provided) */}
         {viewMode === 'feed' ? (
           <div>
-            {sortedPhotosForFeed.length === 0 ? (
+            {interleavedFeed.length === 0 ? (
               <div className="text-center py-10 px-4 bg-pink-50/50 rounded-2xl border border-dashed border-pink-200">
                 <ImageIcon className="w-10 h-10 text-pink-300 mx-auto mb-2" />
-                <h4 className="text-sm font-bold text-slate-800">No photos shared in the feed yet!</h4>
+                <h4 className="text-sm font-bold text-slate-800">No posts in the feed yet!</h4>
                 <p className="text-xs text-slate-500 mt-1">
-                  Be the very first guest to snap &amp; share a party photo above!
+                  Be the first to share a photo or leave a birthday wish above!
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {sortedPhotosForFeed.map((photo) => renderFeedPost(photo))}
+                {interleavedFeed.map((item) =>
+                  item.type === 'photo'
+                    ? renderFeedPost(item.data as GuestPhoto)
+                    : renderWishPost(item.data as BirthdayWish)
+                )}
               </div>
             )}
           </div>

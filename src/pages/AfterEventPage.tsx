@@ -6,8 +6,6 @@ import {
 import confetti from 'canvas-confetti';
 import { HeroSection } from '../components/HeroSection';
 import { PhotoGallerySection } from '../components/PhotoGallerySection';
-import { WishesWall } from '../components/WishesWall';
-import { ShareImagesEncouragementCard } from '../components/ShareImagesEncouragementCard';
 import { GuestPhotoSection } from '../components/GuestPhotoSection';
 import { MusicPlayer } from '../components/MusicPlayer';
 import { ScrollReveal } from '../components/ScrollReveal';
@@ -224,36 +222,22 @@ export const AfterEventPage: React.FC<AfterEventPageProps> = ({
               </div>
             </ScrollReveal>
 
-            {/* Celestine Photo Highlights Gallery */}
+            {/* Guest Photo Feed & Wall of Wishes — Facebook-wall-style (wishes interleaved in the feed) */}
+            <ScrollReveal delay={50}>
+              <GuestPhotoSection
+                celebrantName={party.celebrantName}
+                defaultView="feed"
+                wishes={wishes}
+                onAddWish={onAddWish}
+                onLikeWish={onLikeWish}
+              />
+            </ScrollReveal>
+
+            {/* Celestine Photo Highlights Gallery (LAST SECTION) */}
             <ScrollReveal delay={50}>
               <div id="highlights-gallery">
                 <PhotoGallerySection />
               </div>
-            </ScrollReveal>
-
-            {/* Birthday Wishes Guestbook */}
-            <ScrollReveal delay={50}>
-              <div id="wishes-section">
-                <WishesWall
-                  wishes={wishes}
-                  celebrantName={party.celebrantName}
-                  onAddWish={onAddWish}
-                  onLikeWish={onLikeWish}
-                />
-              </div>
-            </ScrollReveal>
-
-            {/* We Encourage You to Share Images Section */}
-            <ScrollReveal delay={50}>
-              <ShareImagesEncouragementCard
-                celebrantName={party.celebrantName}
-                onUploadClick={() => scrollToSection('guest-photos-section')}
-              />
-            </ScrollReveal>
-
-            {/* Guest Photo Album & Keepsake Uploader - Facebook feed style (LAST SECTION) */}
-            <ScrollReveal delay={50}>
-              <GuestPhotoSection celebrantName={party.celebrantName} defaultView="feed" />
             </ScrollReveal>
           </div>
         </div>
