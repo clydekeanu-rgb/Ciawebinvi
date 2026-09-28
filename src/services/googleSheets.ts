@@ -198,7 +198,33 @@ export const fetchWishesFromGoogleSheet = async (): Promise<BirthdayWish[] | nul
     });
     if (!res.ok) return null;
     const data = await res.json();
-    return Array.isArray(data) ? data : null;
+    if (!Array.isArray(data)) return null;
+
+    const validEmojis = ['💖', '🐱', '✨', '🧁', '👑', '🎉', '🦄', '🎈'];
+
+    return data
+      .map((w: any) => {
+        const isRsvpRow = w.message === 'yes' || w.message === 'no';
+        const actualMessage = isRsvpRow ? (w.timestamp || '') : (w.message || '');
+        const idMatch = String(w.id || '').match(/\d{12,14}/);
+        const ts = idMatch ? parseInt(idMatch[0], 10) : 0;
+        let displayTime = w.timestamp;
+        if (isRsvpRow || !w.timestamp || w.timestamp === actualMessage) {
+          displayTime = ts
+            ? new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            : 'Birthday Note';
+        }
+        const sticker = validEmojis.includes(w.sticker) ? w.sticker : '💖';
+        return {
+          id: String(w.id || `wish-${Date.now()}`),
+          sender: String(w.sender || 'Party Guest'),
+          message: String(actualMessage),
+          sticker,
+          likes: parseInt(w.likes || 0),
+          timestamp: displayTime
+        };
+      })
+      .filter((w: BirthdayWish) => w.message && w.message.trim().length > 0);
   } catch (error) {
     console.warn('Google Sheets wishes fetch failed:', error);
     return null;

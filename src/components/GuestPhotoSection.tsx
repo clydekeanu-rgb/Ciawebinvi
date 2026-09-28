@@ -389,6 +389,22 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
     return items;
   };
 
+  const getPhotoTime = (photo: GuestPhoto, index: number): number => {
+    if (photo.createdAt && /just now/i.test(photo.createdAt)) {
+      return Date.now() + 100000;
+    }
+    const idMatch = photo.id?.match(/\d{12,14}/);
+    if (idMatch) {
+      const ts = parseInt(idMatch[0], 10);
+      if (!isNaN(ts) && ts > 1000000000) return ts;
+    }
+    if (photo.createdAt) {
+      const parsed = Date.parse(photo.createdAt);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return index;
+  };
+
   const sortedPhotosForFeed = [...photos].sort((a, b) => {
     if (feedSortBy === 'popular') {
       const metaA = getPhotoMeta(a);
@@ -397,7 +413,10 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
       const totalB = Object.values(metaB.reactions).reduce((sum, v) => sum + v, 0);
       return totalB - totalA;
     }
-    return 0; // Default is newest first
+    // Newest first as default
+    const timeA = getPhotoTime(a, photos.indexOf(a));
+    const timeB = getPhotoTime(b, photos.indexOf(b));
+    return timeB - timeA;
   });
 
   const renderPhotoCard = (photo: GuestPhoto, key: string | number) => (
@@ -698,6 +717,16 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
 
   // Render a Birthday Wish as a Facebook-Wall-Style Post
   const renderWishPost = (wish: BirthdayWish) => {
+    const isRsvpRow = wish.message === 'yes' || wish.message === 'no';
+    const displayMessage = isRsvpRow ? (wish.timestamp || '') : wish.message;
+    const idMatch = wish.id?.match(/\d{12,14}/);
+    let displayDate = wish.timestamp;
+    if (isRsvpRow || !wish.timestamp || wish.timestamp === displayMessage) {
+      displayDate = idMatch
+        ? new Date(parseInt(idMatch[0], 10)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        : 'Birthday Note';
+    }
+
     return (
       <article
         key={`wish-post-${wish.id}`}
@@ -718,7 +747,7 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
                 {wish.sender}
               </h4>
               <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
-                <span>{wish.timestamp || 'Birthday Note'}</span>
+                <span>{displayDate || 'Birthday Note'}</span>
                 <span>•</span>
                 <span className="text-fuchsia-600 font-semibold flex items-center gap-0.5">
                   <MessageCircleHeart className="w-2.5 h-2.5" /> Birthday Wish
@@ -726,12 +755,12 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
               </div>
             </div>
           </div>
-          <span className="text-2xl">{wish.sticker}</span>
+          <span className="text-2xl">{wish.sticker || '💖'}</span>
         </div>
 
         {/* Wish Message Body */}
         <div className="px-4 pb-3 text-sm sm:text-base text-slate-800 leading-relaxed font-normal whitespace-pre-wrap">
-          {wish.message}
+          {displayMessage}
         </div>
 
         {/* Wish Gradient Accent Bar */}
@@ -787,28 +816,68 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
     });
   };
 
-  // Build interleaved feed: photos + wishes merged chronologically
+  const getWishTime = (wish: BirthdayWish, index: number): number => {
+    if (wish.timestamp && /just now/i.test(wish.timestamp)) {
+      return Date.now() + 100000;
+    }
+    const idMatch = wish.id?.match(/\d{12,14}/);
+    if (idMatch) {
+      const ts = parseInt(idMatch[0], 10);
+      if (!isNaN(ts) && ts > 1000000000) return ts;
+    }
+    if (wish.timestamp) {
+      const parsed = Date.parse(wish.timestamp);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return index;
+  };
+
+  // Build interleaved feed: photos + wishes, sorted newest first by default
   type FeedItem = { type: 'photo'; data: GuestPhoto } | { type: 'wish'; data: BirthdayWish };
 
   const interleavedFeed: FeedItem[] = (() => {
-    const photoItems: FeedItem[] = sortedPhotosForFeed.map(p => ({ type: 'photo' as const, data: p }));
+    const photoItems: FeedItem[] = sortedPhotosForFeed.map((p) => ({
+      type: 'photo' as const,
+      data: p,
+    }));
 
     if (!wishes || wishes.length === 0) return photoItems;
 
-    const wishItems: FeedItem[] = wishes.map(w => ({ type: 'wish' as const, data: w }));
+    // Filter valid wishes and sort newest first (or by likes if popular)
+    const sortedWishes = [...wishes]
+      .filter((w) => {
+        const isRsvpRow = w.message === 'yes' || w.message === 'no';
+        const msg = isRsvpRow ? (w.timestamp || '') : w.message;
+        return msg && msg.trim().length > 0;
+      })
+      .sort((a, b) => {
+        if (feedSortBy === 'popular') {
+          return (b.likes || 0) - (a.likes || 0);
+        }
+        const timeA = getWishTime(a, wishes.indexOf(a));
+        const timeB = getWishTime(b, wishes.indexOf(b));
+        return timeB - timeA; // Newest first
+      });
+
+    const wishItems: FeedItem[] = sortedWishes.map((w) => ({
+      type: 'wish' as const,
+      data: w,
+    }));
+
+    if (photoItems.length === 0) {
+      return wishItems;
+    }
 
     // Interleave: show a wish after every 2 photos, then remaining wishes at the end
     const merged: FeedItem[] = [];
     let wishIdx = 0;
     for (let i = 0; i < photoItems.length; i++) {
       merged.push(photoItems[i]);
-      // After every 2nd photo, insert a wish
       if ((i + 1) % 2 === 0 && wishIdx < wishItems.length) {
         merged.push(wishItems[wishIdx]);
         wishIdx++;
       }
     }
-    // Append remaining wishes
     while (wishIdx < wishItems.length) {
       merged.push(wishItems[wishIdx]);
       wishIdx++;
@@ -846,7 +915,7 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
               >
                 <Filter className="w-3 h-3 text-purple-500" />
                 <span className="font-bold text-purple-700">
-                  {feedSortBy === 'latest' ? 'Latest' : 'Most Loved'}
+                  {feedSortBy === 'latest' ? 'Newest' : 'Most Loved'}
                 </span>
               </button>
             )}
