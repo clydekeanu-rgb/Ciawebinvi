@@ -20,50 +20,52 @@ export function getAutoHomepage(targetDateIso: string = initialPartyDetails.date
     eventDayEnd.setHours(23, 59, 59, 999);
 
     if (now < eventDayStart) {
-      return 'pre';
+      return 'before';
     } else if (now <= eventDayEnd) {
       return 'during';
     } else {
       return 'after';
     }
   } catch {
-    return 'pre';
+    return 'before';
   }
 }
 
 /**
  * Parses the current route from:
- * 1. URL search params: ?page=during | ?view=after | ?tab=...
- * 2. URL hash: #/during | #/after | #during
- * 3. URL pathname: /during | /after | /pre
+ * 1. URL search params: ?page=during | ?view=after | ?page=before | ...
+ * 2. URL hash: #/during | #/after | #/before
+ * 3. URL pathname: /during | /after | /before | /pre
  * 4. Fallback to homepageMode (or auto-calculated if mode is 'auto')
  */
-export function getCurrentRoute(homepageMode: HomepageMode = 'pre'): PageRoute {
-  if (typeof window === 'undefined') return 'pre';
+export function getCurrentRoute(homepageMode: HomepageMode = 'during'): PageRoute {
+  if (typeof window === 'undefined') return 'during';
 
   // 1. Check Search Parameters
   const params = new URLSearchParams(window.location.search);
   const paramVal = (params.get('page') || params.get('view') || params.get('tab') || '').toLowerCase();
   if (paramVal === 'during') return 'during';
   if (paramVal === 'after') return 'after';
-  if (paramVal === 'pre') return 'pre';
+  if (paramVal === 'before' || paramVal === 'pre') return 'before';
 
   // 2. Check Hash
   const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().split('?')[0];
   if (hash === 'during') return 'during';
   if (hash === 'after') return 'after';
-  if (hash === 'pre') return 'pre';
+  if (hash === 'before' || hash === 'pre') return 'before';
 
   // 3. Check Pathname
   const pathname = window.location.pathname.toLowerCase().replace(/\/$/, '');
   if (pathname.endsWith('/during')) return 'during';
   if (pathname.endsWith('/after')) return 'after';
-  if (pathname.endsWith('/pre')) return 'pre';
+  if (pathname.endsWith('/before') || pathname.endsWith('/pre')) return 'before';
 
   // 4. Default Root ("/") Homepage resolution
   if (homepageMode === 'auto') {
     return getAutoHomepage(initialPartyDetails.dateIso);
   }
+
+  if (homepageMode === 'pre') return 'before';
 
   return homepageMode;
 }
@@ -80,8 +82,8 @@ export function navigateTo(target: PageRoute | string) {
     nextUrl = '/during';
   } else if (target === 'after' || target === '/after') {
     nextUrl = '/after';
-  } else if (target === 'pre' || target === '/pre') {
-    nextUrl = '/';
+  } else if (target === 'before' || target === '/before' || target === 'pre' || target === '/pre') {
+    nextUrl = '/before';
   } else if (typeof target === 'string') {
     nextUrl = target;
   }
@@ -99,7 +101,7 @@ export function navigateTo(target: PageRoute | string) {
 /**
  * Hook to read and subscribe to the active route.
  */
-export function useCurrentRoute(homepageMode: HomepageMode = 'pre') {
+export function useCurrentRoute(homepageMode: HomepageMode = 'during') {
   const [route, setRoute] = useState<PageRoute>(() => getCurrentRoute(homepageMode));
 
   const refreshRoute = useCallback(() => {

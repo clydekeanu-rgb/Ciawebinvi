@@ -101,7 +101,7 @@ export default function App() {
         />
       )}
 
-      {route === 'pre' && (
+      {(route === 'before' || route === 'pre') && (
         <PreEventPage
           party={party}
           rsvps={rsvps}

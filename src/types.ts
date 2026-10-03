@@ -106,6 +106,6 @@ export interface GuestPhoto {
   comments?: GuestPhotoComment[];
 }
 
-export type PageRoute = 'pre' | 'during' | 'after';
-export type HomepageMode = 'pre' | 'during' | 'after' | 'auto';
+export type PageRoute = 'before' | 'pre' | 'during' | 'after';
+export type HomepageMode = 'before' | 'pre' | 'during' | 'after' | 'auto';
 
