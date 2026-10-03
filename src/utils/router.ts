@@ -44,18 +44,21 @@ export function getCurrentRoute(homepageMode: HomepageMode = 'during'): PageRout
   // 1. Check Search Parameters
   const params = new URLSearchParams(window.location.search);
   const paramVal = (params.get('page') || params.get('view') || params.get('tab') || '').toLowerCase();
+  if (paramVal === 'upload') return 'upload';
   if (paramVal === 'during') return 'during';
   if (paramVal === 'after') return 'after';
   if (paramVal === 'before' || paramVal === 'pre') return 'before';
 
   // 2. Check Hash
   const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().split('?')[0];
+  if (hash === 'upload') return 'upload';
   if (hash === 'during') return 'during';
   if (hash === 'after') return 'after';
   if (hash === 'before' || hash === 'pre') return 'before';
 
   // 3. Check Pathname
   const pathname = window.location.pathname.toLowerCase().replace(/\/$/, '');
+  if (pathname.endsWith('/upload')) return 'upload';
   if (pathname.endsWith('/during')) return 'during';
   if (pathname.endsWith('/after')) return 'after';
   if (pathname.endsWith('/before') || pathname.endsWith('/pre')) return 'before';
@@ -78,7 +81,9 @@ export function navigateTo(target: PageRoute | string) {
   if (typeof window === 'undefined') return;
 
   let nextUrl = '/';
-  if (target === 'during' || target === '/during') {
+  if (target === 'upload' || target === '/upload') {
+    nextUrl = '/upload';
+  } else if (target === 'during' || target === '/during') {
     nextUrl = '/during';
   } else if (target === 'after' || target === '/after') {
     nextUrl = '/after';

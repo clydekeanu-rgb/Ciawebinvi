@@ -6,6 +6,7 @@ import { useCurrentRoute } from './utils/router';
 import { PreEventPage } from './pages/PreEventPage';
 import { DuringEventPage } from './pages/DuringEventPage';
 import { AfterEventPage } from './pages/AfterEventPage';
+import { QuickUploadPage } from './pages/QuickUploadPage';
 
 export default function App() {
   const party: PartyDetails = initialPartyDetails;
@@ -83,6 +84,12 @@ export default function App() {
 
   return (
     <>
+      {route === 'upload' && (
+        <QuickUploadPage
+          celebrantName={party.celebrantName}
+        />
+      )}
+
       {route === 'during' && (
         <DuringEventPage
           party={party}
