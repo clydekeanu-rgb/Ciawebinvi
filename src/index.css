@@ -92,6 +92,35 @@
   animation: shimmer 2.5s infinite;
 }
 
+@keyframes feed-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.feed-skeleton {
+  background-color: #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.feed-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: feed-shimmer 1.5s infinite;
+}
+
 /* Polka dot and sparkle background patterns */
 .dollhouse-dots {
   background-image: radial-gradient(#f472b6 1.5px, transparent 1.5px), radial-gradient(#38bdf8 1.5px, transparent 1.5px);

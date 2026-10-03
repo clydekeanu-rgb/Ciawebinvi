@@ -25,6 +25,7 @@ import {
   fetchPhotoCommentsFromGoogleSheet,
   postPhotoCommentToGoogleSheet
 } from '../services/googleSheets';
+import { FeedImage } from './FeedImage';
 
 interface GuestPhotoSectionProps {
   celebrantName: string;
@@ -461,7 +462,7 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
   );
 
   // Render a Single Facebook-Style Post Card
-  const renderFeedPost = (photo: GuestPhoto) => {
+  const renderFeedPost = (photo: GuestPhoto, priority = false) => {
     const meta = getPhotoMeta(photo);
     const totalReactions = Object.values(meta.reactions).reduce((acc, v) => acc + v, 0);
     const isCommentsOpen = expandedComments[photo.id] ?? true; // Open comments by default for friendly engagement
@@ -512,24 +513,18 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
           </div>
         )}
 
-        {/* Post Media: Full-Width Photo with Tap to Expand */}
-        <div
-          onClick={() => {
-            const idx = photos.findIndex((p) => p.id === photo.id);
-            if (idx !== -1) setActiveLightboxIndex(idx);
-          }}
-          className="relative w-full aspect-4/3 sm:aspect-16/10 bg-slate-950 overflow-hidden cursor-pointer group"
-        >
-          <img
+        {/* Post Media: Full-Width Photo with Tap to Expand & Skeleton Shimmer Loader */}
+        {photo.imageUrl && (
+          <FeedImage
             src={photo.imageUrl}
             alt={photo.caption || `Photo by ${photo.uploaderName}`}
-            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-            loading="lazy"
+            priority={priority}
+            onExpand={() => {
+              const idx = photos.findIndex((p) => p.id === photo.id);
+              if (idx !== -1) setActiveLightboxIndex(idx);
+            }}
           />
-          <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-xs text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-            <Maximize2 className="w-3.5 h-3.5" />
-          </div>
-        </div>
+        )}
 
         {/* Reactions & Comments Summary Counters Bar */}
         <div className="px-4 py-2 flex items-center justify-between text-[11px] text-slate-500 border-b border-pink-50">
@@ -1129,9 +1124,9 @@ export const GuestPhotoSection: React.FC<GuestPhotoSectionProps> = ({
               </div>
             ) : (
               <div className="space-y-4">
-                {interleavedFeed.map((item) =>
+                {interleavedFeed.map((item, index) =>
                   item.type === 'photo'
-                    ? renderFeedPost(item.data as GuestPhoto)
+                    ? renderFeedPost(item.data as GuestPhoto, index < 2)
                     : renderWishPost(item.data as BirthdayWish)
                 )}
               </div>
